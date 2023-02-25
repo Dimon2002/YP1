@@ -81,10 +81,6 @@ void DirectoryTraversal(DIR* startDir, char* dirPath)
       if ((st.st_mode & MASK) != IFDIR)
 	 continue;
 
-      // Если одна из "особых" директорий -> идем к следующей записи
-      if (strcmp(record->d_name, "..") == 0 || strcmp(record->d_name, ".") == 0)
-         continue;
-      
       // Открывает директорию
       DIR* nestedDirectory = opendir(Concat(dirPath, record->d_name));
 
