@@ -104,7 +104,7 @@ int main()
    // Выделяем динамическую память для хранения пути к стартовому каталогу
    char* dirName = (char*)malloc(NMAX * sizeof(char));
    
-   printf("Input path to dir: ");
+   printf("Input path to dir: \n");
    scanf("%s", dirName);
 
    // Если dirName не равен нулю, а первый символ символьного массива 'dirName' не равен '\0', тогда
