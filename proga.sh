@@ -4,7 +4,7 @@ if [ -e $1 ] && [ -d $1 ]; then
   if [ -r $1 ]; then
   
     #Переходим в этот каталог
-    cd $1 2>sherror.txt
+    cd $1 2> sherror.txt
   
     #Оформляем рамку таблицы вывода
     echo '========================'
@@ -22,7 +22,7 @@ if [ -e $1 ] && [ -d $1 ]; then
       do
 
          #Переходим в этот подкаталог
-         cd $element 2>sherror.txt
+         cd $element 2> sherror.txt
 
          #Подсчитываем количество каталогов в текущем подкаталоге
          insidenumber="$(ls -F|grep '/'|wc -w)"
