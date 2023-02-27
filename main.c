@@ -1,6 +1,6 @@
 #include <dirent.h>
 #include <malloc.h>
-#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 
@@ -43,7 +43,11 @@ int IsEmptyDir(DIR* dirToCheck, char* dirName)
       
       // Если не удалось взять информацию о файле -> идем к следующей записи
       if (stat(Concat(dirName, record->d_name), &st) != 0)
-	 continue;
+      {
+         fprintf(stderr, "%s -> ", Concat(dirName, record->d_name));
+         perror("stat()");
+         continue;
+      }
 
       // Если это особые директории -> идем к следующей записи
       if (strcmp(record->d_name, "..") == 0 || strcmp(record->d_name, ".") == 0)
@@ -75,7 +79,11 @@ void DirectoryTraversal(DIR* startDir, char* dirPath)
 
       // Если не удалось взять информацию о файле -> идем к следующей записи
       if (stat(Concat(dirPath, record->d_name), &st) != 0)
-	 continue;
+      {
+         fprintf(stderr, "%s -> ", Concat(dirPath, record->d_name));
+         perror("stat()");
+         continue;
+      }
 
       // Если не директория -> идем к следующей записи
       if ((st.st_mode & MASK) != IFDIR)
@@ -86,7 +94,11 @@ void DirectoryTraversal(DIR* startDir, char* dirPath)
 
       // При неуспешном открытии директории -> идем к следующей записи
       if (nestedDirectory == NULL)
-	 continue;
+      {
+         fprintf(stderr, "%s -> ", Concat(dirPath,record->d_name));
+         perror("opendir()");
+         continue;
+      }
      
       // Если пустая директория -> выводим ее имя
       if (IsEmptyDir(nestedDirectory, Concat(Concat(dirPath, record->d_name), "/")))
@@ -99,40 +111,39 @@ void DirectoryTraversal(DIR* startDir, char* dirPath)
    printf("\n========================\n");
 }
 
-int main()
+int main(int numberOfArguments, char *arguments[])
 {
+   // Если не была введена дирректория
+   if (numberOfArguments < 2)
+   {
+      fprintf(stderr, "Arguments too few (The directory name is missing)\n");
+      return EXIT_FAILURE;
+   }
+
    // Выделяем динамическую память для хранения пути к стартовому каталогу
    char* dirName = (char*)malloc(NMAX * sizeof(char));
+  
+   dirName = Concat(arguments[1], "/");
    
-   printf("Input path to dir: \n");
-   scanf("%s", dirName);
-
-   // Если dirName не равен нулю, а первый символ символьного массива 'dirName' не равен '\0', тогда
-   if (strlen(dirName) == 0)
-   {
-      printf("Empty path!\n");
-      return 0;
-   }
-   
-   dirName = Concat(dirName, "/");
-
    // Открывает директорию
    DIR* d = opendir(dirName);
 
    // При неуспешном открытии директории
    if (d == NULL)
-   {
-      printf("Can`t opened!\n");
-      return 0;
+   {  
+      fprintf(stderr, "%s -> ", arguments[1]);
+      perror("opendir()");
+      return EXIT_FAILURE;
    }
 
    DirectoryTraversal(d, dirName);
 
-   printf("Красава!\n");
+   // printf("Красава!\n");
 
    // Освобождаем память выделенную malloc
    free(dirName);
+   // Закрывает открытую ранее директорию
    closedir(d);
 
-   return 0;
+   return EXIT_SUCCESS;
 }
